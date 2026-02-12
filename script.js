@@ -57,6 +57,17 @@ document.addEventListener('DOMContentLoaded', () => {
         el.classList.add('fade-in-initial');
         observer.observe(el);
     });
+
+    // NAVBAR TOGGLE LOGIC
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navLinks = document.querySelector('.nav-links');
+
+    if (menuToggle && navLinks) {
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            menuToggle.classList.toggle('active');
+        });
+    }
 });
 
 // HERO VIDEO SAFETY
@@ -277,11 +288,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// FIXED: Removed duplicate GSAP/ScrollTrigger block
-// Reason: there was a duplicate GSAP initialization (with slightly different initial
-// states and event listeners) which caused conflicting animation state and
-// doubled event handlers. The earlier GSAP block (above) now handles all
-// .ball-* animations, scrollTrigger timeline, and cursor interactions.
 
 
 // =========================================
@@ -331,7 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     pin: true,        // PIN THE SECTION
                     scrub: 1,         // Smooth scrubbing
                     anticipatePin: 1  // Avoid jitter
-                    // markers: true // Uncomment for debugging
+
                 }
             });
 
@@ -364,7 +370,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // =========================================
 document.addEventListener('DOMContentLoaded', () => {
     const blurObserverOptions = {
-        threshold: 0.5, // Trigger when 50% visible (center of viewport approx)
+        threshold: 0.9,
         rootMargin: "0px 0px -10% 0px"
     };
 
@@ -386,9 +392,7 @@ document.addEventListener('DOMContentLoaded', () => {
         blurObserver.observe(revenueHeader);
     }
 
-    // =========================================
-    // SERVICES PINNING & REVEAL
-    // =========================================
+
     if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
         const servicesSection = document.querySelector('.section-services');
         const serviceItems = document.querySelectorAll('.service-item');
@@ -416,7 +420,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     start: "top top",
                     end: "+=3000",
                     pin: true,
-                    scrub: 1, // Smooth scrub
+                    scrub: 1,
                     anticipatePin: 1
                 }
             });
@@ -476,14 +480,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (metricSection && tenXText && metricDesc) {
             // A. SPLIT TEXT (10X)
-const chars10X = tenXText.innerText.split('');
-tenXText.innerHTML = chars10X.map(char => `<span style="display:inline-block; transform:translateX(80px); transform-origin: left center;">${char}</span>`).join('');
-const tenXSpans = tenXText.querySelectorAll('span');
+            const chars10X = tenXText.innerText.split('');
+            tenXText.innerHTML = chars10X.map(char => `<span style="display:inline-block; transform:translateX(80px); transform-origin: left center;">${char}</span>`).join('');
+            const tenXSpans = tenXText.querySelectorAll('span');
 
-tenXText.style.overflow = 'visible';
-tenXText.style.display = 'inline-flex';
-tenXText.style.verticalAlign = 'bottom';
-tenXText.style.width = 'auto';
+            tenXText.style.overflow = 'visible';
+            tenXText.style.display = 'inline-flex';
+            tenXText.style.verticalAlign = 'bottom';
+            tenXText.style.width = 'auto';
 
 
             // SAFETY FIX: Prevent clipping in Services section
@@ -574,13 +578,14 @@ tenXText.style.width = 'auto';
             const xSpan = tenXSpans[2];
             if (xSpan) {
                 gsap.to(xSpan, {
-                    x: "1",
-                    y: "-=1",
+                    xPercent: 3,
+                    yPercent: -3,
                     rotation: 1.5,
                     duration: 0.1,
                     repeat: -1,
                     yoyo: true,
-                    ease: "sine.inOut"
+                    ease: "sine.inOut",
+                    overwrite: "auto"
                 });
             }
         }
@@ -594,3 +599,654 @@ if (window.innerWidth <= 1024) {
         }
     });
 }
+
+
+
+
+// ===============================
+// FOUR CARDS SCROLL STORYTELLING
+// ===============================
+if (typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined") {
+    gsap.registerPlugin(ScrollTrigger);
+
+    // 4. FOUR CARDS ANIMATION (Strict Bottom-Up + Beams)
+    // ===================================
+    const fourCardsSection = document.querySelector(".section-four-cards");
+    const fourCardWrappers = document.querySelectorAll(".four-card-wrapper");
+
+    if (fourCardsSection && fourCardWrappers.length > 0) {
+        // Set Initial States Forcefully via GSAP to ensure consistency
+        gsap.set(fourCardWrappers, {
+            y: 120,
+            opacity: 0,
+            filter: "blur(12px)"
+        });
+
+        const cardBeams = document.querySelectorAll(".card-beam");
+        gsap.set(cardBeams, {
+            scaleY: 0,
+            transformOrigin: "top center",
+            opacity: 0
+        });
+
+        const fcTl = gsap.timeline({
+            scrollTrigger: {
+                trigger: ".section-four-cards",
+                start: "top top",
+                end: "+=3000", /* 300vh scroll distance */
+                scrub: 1,
+                pin: true,
+                anticipatePin: 1
+            }
+        });
+
+        // Loop through each card/beam pair
+        fourCardWrappers.forEach((wrapper, index) => {
+            const beam = wrapper.querySelector(".card-beam");
+
+            // 1. Card Enters from Bottom
+            fcTl.to(wrapper, {
+                y: 0,
+                opacity: 1,
+                filter: "blur(0px)",
+                duration: 2,
+                ease: "power3.out"
+            });
+
+            // 2. Beam Grows Downward (After card settles)
+            if (beam) {
+                fcTl.to(beam, {
+                    scaleY: 1,
+                    opacity: 1,
+                    duration: 1.5,
+                    ease: "power2.out"
+                });
+            }
+        });
+
+        // Final buffer to keep everything visible
+        fcTl.to({}, { duration: 1 });
+
+        // GLOBAL BEAM ANIMATION (Critical Continuity)
+        // ===================================
+        const globalBeam = document.querySelector(".global-beam");
+        if (globalBeam) {
+            // Grow continuously from start to finish + overlap
+            fcTl.to(globalBeam, {
+                scaleY: 1,
+                ease: "none",
+                duration: fcTl.totalDuration() || 5
+            }, 0); // Start at 0 to grow while scrolling
+        }
+    }
+
+    // Mobile: disable pin on small screens
+    if (window.innerWidth <= 1024) {
+        ScrollTrigger.getAll().forEach(st => {
+            if (st.trigger?.classList?.contains('section-four-cards')) {
+                st.kill();
+            }
+        });
+    }
+}
+
+
+
+// POV SCROLL STORY SECTION
+// ===============================
+if (typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined") {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const povSection = document.querySelector(".section-pov-scroll");
+    if (povSection) {
+        // Elements
+        const card3d = document.querySelector(".pov-card-3d");
+        const cardHeading = document.getElementById("card-heading");
+        const navItems = document.querySelectorAll(".flow-item");
+
+        // Data for stages
+        const stages = [
+            { id: "seo", title: "SEO Foundation" },
+            { id: "ai", title: "AI Visibility" },
+            { id: "rev", title: "Revenue Engine" }
+        ];
+
+        // Master Timeline
+        const povTl = gsap.timeline({
+            scrollTrigger: {
+                trigger: ".section-pov-scroll",
+                start: "top top",
+                end: "bottom bottom",
+                scrub: 1, // Smooth scrubbing
+                pin: ".pov-content-wrapper", // Pin the content
+                anticipatePin: 1
+            }
+        });
+
+        // 1. Card Rotation (Total 3 full rotations = 1080 degrees over the scroll duration)
+        povTl.to(card3d, {
+            rotationY: 1080,
+            ease: "none", // Linear rotation linked to scroll
+            duration: 3
+        });
+        const stageData = [
+            {
+                nav: 0,
+                title: "SEO Foundation",
+                image: "images/dashboard.png",
+
+                leftTitle: "Get Discovered →",
+                leftText: "Across search engines and AI models",
+
+                rightTitle: "Build Authority",
+                rightText: "Rank consistently on Google and Bing",
+
+                quote: `"Traffic is attention.<br>Authority converts it."`
+            },
+            {
+                nav: 1,
+                title: "AI Visibility",
+                image: "/images/ai.png",
+
+                leftTitle: "Be Referenced →",
+                leftText: "Across ChatGPT, Claude & Gemini",
+
+                rightTitle: "Get Recommended",
+                rightText: "By LLMs, not just algorithms",
+
+                quote: `"If AI mentions you — you win."`
+            },
+            {
+                nav: 2,
+                title: "Revenue Engine",
+                image: "/images/revenue.png",
+
+                leftTitle: "Drive Revenue →",
+                leftText: "Turn visibility into pipeline",
+
+                rightTitle: "Scale Growth",
+                rightText: "Search as a Growth Service",
+
+                quote: `"Visibility without revenue is noise."`
+            }
+        ];
+
+        // Helper to set active stage
+        function updateStage(index) {
+
+            const data = stageData[index];
+            if (!data) return;
+
+            // ========================
+            // NAV UPDATE
+            // ========================
+            navItems.forEach((item, i) => {
+                const isActive = i === index;
+                item.classList.toggle("active", isActive);
+
+                gsap.to(item, {
+                    filter: isActive ? "blur(0px)" : "blur(6px)",
+                    opacity: isActive ? 1 : 0.4,
+                    duration: 0.4,
+                    overwrite: true
+                });
+            });
+
+            const cardImg = document.getElementById("pov-card-img");
+            const leftBox = document.querySelector(".pov-side-text.left");
+            const rightBox = document.querySelector(".pov-side-text.right");
+
+            // ========================
+            // FADE OUT ALL CONTENT
+            // ========================
+            gsap.to(
+                [cardHeading, cardImg, leftBox, rightBox],
+                {
+                    opacity: 0,
+                    duration: 0.25,
+                    onComplete: () => {
+
+                        // ========================
+                        // UPDATE CENTER CARD
+                        // ========================
+                        if (cardHeading) cardHeading.innerText = data.title;
+                        if (cardImg) cardImg.src = data.image;
+
+                        // ========================
+                        // UPDATE LEFT SIDE
+                        // ========================
+                        if (leftBox) {
+                            leftBox.querySelector("h3").innerText = data.leftTitle;
+                            leftBox.querySelector(".subtext").innerText = data.leftText;
+                        }
+
+                        // ========================
+                        // UPDATE RIGHT SIDE
+                        // ========================
+                        if (rightBox) {
+                            rightBox.querySelector("h3").innerText = data.rightTitle;
+                            rightBox.querySelector(".subtext").innerText = data.rightText;
+
+                            const quoteEl = rightBox.querySelector(".pov-quote");
+                            if (quoteEl) quoteEl.innerHTML = data.quote;
+                        }
+
+                        // ========================
+                        // FADE BACK IN
+                        // ========================
+                        gsap.to(
+                            [cardHeading, cardImg, leftBox, rightBox],
+                            {
+                                opacity: 1,
+                                duration: 0.4,
+                                ease: "power2.out"
+                            }
+                        );
+                    }
+                }
+            );
+        }
+
+
+
+        // 2. Schedule Callbacks for Stage Changes
+        // Timeline duration is 3. 
+        // 0 -> Start (SEO)
+        // 1 -> 33% (AI)
+        // 2 -> 66% (Revenue)
+
+        povTl.call(() => updateStage(0), null, 0);     // 0%
+        povTl.call(() => updateStage(1), null, 0.95);  // ~32% (Just before 33%)
+        povTl.call(() => updateStage(2), null, 1.95);  // ~65% (Just before 66%)
+    }
+}
+// ===============================
+// WORKFLOW SLIDER (6-STEP)
+// ===============================
+document.addEventListener('DOMContentLoaded', () => {
+
+    const workflowSection = document.querySelector('.section-workflow');
+    if (!workflowSection) return;
+
+    const navPills = document.querySelectorAll('.nav-pill');
+    const stepBadge = document.querySelector('.step-badge');
+    const stepTitle = document.querySelector('.step-title');
+    const stepDesc = document.querySelector('.step-desc');
+    const workflowText = document.querySelector('.workflow-text');
+
+    const dashMetrics = document.querySelectorAll('.dash-metric');
+    const chartLine = document.querySelector('.chart-line');
+    const gaugeProgress = document.querySelector('.gauge-progress');
+    const gaugeScore = document.querySelector('.gauge-score');
+
+    const stepsData = [
+        {
+            step: "01",
+            title: "We identify your highest-value opportunities.",
+            desc: "Deep dive into market gaps, competitor weaknesses, and high-intent keywords to build a data-backed roadmap.",
+            metrics: ["400K", "2.1M", "3.2%", "12.4"],
+            gauge: 80
+        },
+        {
+            step: "02",
+            title: "We architect a content strategy that wins.",
+            desc: "Mapping topics to buyer journey stages. We plan clustered content that establishes topical authority instantly.",
+            metrics: ["450K", "2.5M", "3.5%", "10.1"],
+            gauge: 85
+        },
+        {
+            step: "03",
+            title: "We produce expert-led, AI-accelerated content.",
+            desc: "Our hybrid engine combines AI speed with human editorial precision to create high-ranking assets at scale.",
+            metrics: ["520K", "3.1M", "3.8%", "8.5"],
+            gauge: 90
+        },
+        {
+            step: "04",
+            title: "We publish and optimize for maximum reach.",
+            desc: "Technical SEO, schema markup, and internal linking automation ensure every piece is primed for indexing.",
+            metrics: ["600K", "3.8M", "4.2%", "6.2"],
+            gauge: 92
+        },
+        {
+            step: "05",
+            title: "We track what’s working and what’s not.",
+            desc: "Every two weeks, we analyze your content performance and deliver detailed reports.",
+            metrics: ["750K", "4.5M", "4.8%", "4.1"],
+            gauge: 95
+        },
+        {
+            step: "06",
+            title: "We amplify winning content for exponential growth.",
+            desc: "Doubling down on top performers and expanding into new topic clusters.",
+            metrics: ["900K", "5.2M", "5.5%", "2.3"],
+            gauge: 98
+        }
+    ];
+
+    let currentStep = 0;
+    let autoPlayInterval;
+    const intervalTime = 4000;
+
+    function updateStep(index) {
+
+        const data = stepsData[index];
+
+        // 1️⃣ Update Nav
+        navPills.forEach(pill => pill.classList.remove('active'));
+        navPills[index].classList.add('active');
+
+        // 2️⃣ Animate Text Out
+        workflowText.style.opacity = "0";
+        workflowText.style.transform = "translateY(20px)";
+
+        setTimeout(() => {
+
+            stepBadge.innerText = `Step ${data.step}`;
+            stepTitle.innerText = data.title;
+            stepDesc.innerText = data.desc;
+
+            workflowText.style.opacity = "1";
+            workflowText.style.transform = "translateY(0)";
+
+        }, 300);
+
+        // 3️⃣ Update Dashboard Metrics Properly
+        dashMetrics.forEach((metric, i) => {
+
+            metric.classList.remove('active');
+
+            const valSpan = metric.querySelector('.dm-value');
+            if (valSpan) {
+                valSpan.innerText = data.metrics[i];
+            }
+
+            // Highlight one metric per step
+            if (i === index % dashMetrics.length) {
+                metric.classList.add('active');
+            }
+        });
+
+        // 4️⃣ Restart Chart Animation
+        if (chartLine) {
+            chartLine.style.animation = 'none';
+            chartLine.offsetHeight; // reflow
+            chartLine.style.animation = 'drawChart 2s ease forwards';
+        }
+
+        // 5️⃣ Gauge Update
+        if (gaugeProgress && gaugeScore) {
+            const maxDash = 126; // circumference
+            const offset = maxDash - (data.gauge / 100 * maxDash);
+
+            gaugeProgress.style.strokeDashoffset = offset;
+
+            animateValue(gaugeScore, parseInt(gaugeScore.innerText) || 0, data.gauge, 800);
+        }
+
+        currentStep = index;
+    }
+
+    function animateValue(element, start, end, duration) {
+        let startTimestamp = null;
+
+        function step(timestamp) {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            element.innerText = Math.floor(progress * (end - start) + start);
+            if (progress < 1) {
+                requestAnimationFrame(step);
+            }
+        }
+
+        requestAnimationFrame(step);
+    }
+
+    function nextStep() {
+        let next = currentStep + 1;
+        if (next >= stepsData.length) next = 0;
+        updateStep(next);
+    }
+
+    function startAutoPlay() {
+        stopAutoPlay();
+        autoPlayInterval = setInterval(nextStep, intervalTime);
+    }
+
+    function stopAutoPlay() {
+        clearInterval(autoPlayInterval);
+    }
+
+    // Click Support
+    navPills.forEach((pill, index) => {
+        pill.addEventListener('click', () => {
+            stopAutoPlay();
+            updateStep(index);
+        });
+    });
+
+    // Pause on hover
+    const card = document.querySelector('.workflow-card');
+    if (card) {
+        card.addEventListener('mouseenter', stopAutoPlay);
+        card.addEventListener('mouseleave', startAutoPlay);
+    }
+
+    // INIT
+    updateStep(0);
+    startAutoPlay();
+
+});
+
+// ===============================
+// WINNING SEARCH ANIMATIONS
+// ===============================
+document.addEventListener('DOMContentLoaded', () => {
+    // Select all elements with the 'scroll-slide-up' class
+    const winCards = document.querySelectorAll('.scroll-slide-up');
+
+    if (winCards.length === 0) return;
+
+    const observerOptions = {
+        threshold: 0.1,  // Trigger when 10% visible
+        rootMargin: '0px 0px -50px 0px' // Slight offset
+    };
+
+    const winObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                // Get the delay class if present (delay-1, delay-2, etc.)
+                let delay = 0;
+                entry.target.classList.forEach(cls => {
+                    if (cls.startsWith('delay-')) {
+                        const num = parseInt(cls.split('-')[1]);
+                        if (!isNaN(num)) delay = num * 100; // 100ms multiplier
+                    }
+                });
+
+                // Apply animation
+                setTimeout(() => {
+                    entry.target.classList.add('visible');
+                }, delay);
+
+                winObserver.unobserve(entry.target); // Run once
+            }
+        });
+    }, observerOptions);
+
+    winCards.forEach(card => {
+        winObserver.observe(card);
+    });
+});
+
+// =========================================
+// PRE-FOOTER CTA ANIMATION
+// =========================================
+document.addEventListener('DOMContentLoaded', () => {
+    // Select elements to animate
+    const saObserverOptions = {
+        threshold: 0.2, // Trigger when 20% visible
+        rootMargin: '0px'
+    };
+
+    const saObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('sa-visible');
+                saObserver.unobserve(entry.target); // Animates once
+            }
+        });
+    }, saObserverOptions);
+
+    const saElements = document.querySelectorAll('.sa-anim-fade-up');
+    saElements.forEach(el => saObserver.observe(el));
+});
+
+
+
+
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const section = document.querySelector(".section-insights");
+    if (!section) return;
+
+    const tabs = document.querySelectorAll(".insight-tab");
+    const leftContent = document.querySelector(".insights-content");
+    const rightCard = document.querySelector(".insights-card");
+    const bgImages = document.querySelectorAll(".insight-bg");
+
+    /* =========================
+       PART 1 – SCROLL REVEAL
+    ========================== */
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                section.classList.add("sa-visible");
+                observer.unobserve(section);
+            }
+        });
+    }, { threshold: 0.2 });
+
+    observer.observe(section);
+
+    /* =========================
+       PART 2 – TAB DATA
+    ========================== */
+
+    const contentData = [
+        {
+            title: "Understand brand visibility",
+            text: "See where your brands are mentioned in Answer Engines"
+        },
+        {
+            title: "Track Prompt Volumes",
+            text: "Monitor frequency of prompts related to your domain"
+        },
+        {
+            title: "Measure Agent Performance",
+            text: "Compare performance across AI agents and assistants"
+        },
+        {
+            title: "Optimize for AI Agents",
+            text: "Customize strategy for specific AI personalities"
+        }
+    ];
+
+    let current = 0;
+    let interval;
+
+    function switchTab(index) {
+
+        if (!tabs[index]) return;
+
+        // Remove active from tabs
+        tabs.forEach(tab => tab.classList.remove("active"));
+        tabs[index].classList.add("active");
+
+        // Fade out content
+        leftContent.classList.add("fade-out");
+        rightCard.classList.add("fade-out");
+
+        setTimeout(() => {
+
+            // Update left text
+            const h2 = leftContent.querySelector("h2");
+            const p = leftContent.querySelector("p");
+
+            if (h2) h2.textContent = contentData[index].title;
+            if (p) p.textContent = contentData[index].text;
+
+            // Update background image
+            if (bgImages.length > 0) {
+                bgImages.forEach(bg => bg.classList.remove("active"));
+                if (bgImages[index]) {
+                    bgImages[index].classList.add("active");
+                }
+            }
+
+            // Fade back in
+            leftContent.classList.remove("fade-out");
+            rightCard.classList.remove("fade-out");
+
+        }, 500);
+
+        current = index;
+    }
+
+    /* =========================
+       AUTO PLAY
+    ========================== */
+
+    function startAutoPlay() {
+        interval = setInterval(() => {
+            let next = current + 1;
+            if (next >= tabs.length) next = 0;
+            switchTab(next);
+        }, 4000);
+    }
+
+    function resetAutoPlay() {
+        clearInterval(interval);
+        startAutoPlay();
+    }
+
+    /* =========================
+       TAB CLICK SUPPORT
+    ========================== */
+
+    tabs.forEach((tab, index) => {
+        tab.addEventListener("click", () => {
+            switchTab(index);
+            resetAutoPlay();
+        });
+    });
+
+    /* =========================
+       START
+    ========================== */
+
+    switchTab(0);
+    startAutoPlay();
+
+    /* =========================
+       PART 3 – ENERGY BEAM
+    ========================== */
+
+    if (!document.querySelector(".insights-energy-beam")) {
+        const beam = document.createElement("div");
+        beam.classList.add("insights-energy-beam");
+        section.appendChild(beam);
+    }
+
+});
+
+// Cursor Glow
+const glow = document.createElement("div");
+glow.classList.add("cursor-glow");
+document.body.appendChild(glow);
+
+document.addEventListener("mousemove", (e) => {
+    glow.style.left = e.clientX + "px";
+    glow.style.top = e.clientY + "px";
+});
