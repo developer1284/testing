@@ -1209,7 +1209,7 @@ section {
 
 .section-revenue {
     padding: 120px 0 0;
-    background-color: #ffffff;
+    background-color: transparent;
     color: #000000;
     overflow: hidden;
     /* Contain margins inside */
@@ -1224,73 +1224,169 @@ section {
 .revenue-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    gap: 100px;
+    align-items: center;
+    /* CHANGE THIS */
+    gap: 130px;
     margin-bottom: 120px;
+    max-width: 1400px;
+    /* ADD */
+    margin-left: auto;
+    /* ADD */
+    margin-right: auto;
+    /* ADD */
 }
 
 .revenue-title {
-    font-size: clamp(48px, 8vw, 84px);
+    font-size: clamp(50px, 9vw, 85px);
     font-weight: 800;
     line-height: 0.95;
     letter-spacing: -2px;
+    color: #ffffff;
+    /* force white */
 }
+
+.blur-target-text {
+    background: linear-gradient(90deg, #8C52FE, #ffffff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
 
 /* Right Side (Image + 10X) */
 .revenue-right-head {
-    width: 420px;
+    flex: 1.2;
+    display: flex;
+    align-items: center;
+    gap: 50px;
+}
+
+/* ===================================== */
+/* GRAPH CARD */
+/* ===================================== */
+
+.revenue-graph-card {
+    flex: 0 0 65%;
+    background: #0a0a0c;
+    border-radius: 24px;
+    height: 380px;
+    padding: 40px;
+    overflow: hidden;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.45);
+}
+
+.revenue-graph-wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.revenue-graph-svg {
+    width: 100%;
+    height: 100%;
+}
+
+.rev-after {
+    filter: drop-shadow(0 0 12px rgba(140, 82, 254, 0.6));
+}
+
+/* ===================================== */
+/* SIDE CARDS */
+/* ===================================== */
+
+.revenue-cards {
+    flex: 0 0 30%;
+    margin-left: auto;
     display: flex;
     flex-direction: column;
     gap: 40px;
 }
 
-/* ===================================== */
-/* IMAGE CARD */
-/* ===================================== */
-
-.image-card {
-    background: #0a0a0c;
-    border-radius: 20px;
-    height: 280px;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-}
-
-.image-card img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-/* ===================================== */
-/* 10X METRIC (ANIMATION SAFE) */
-/* ===================================== */
-
-.metric-10x {
+.card-group {
     display: flex;
-    align-items: baseline;
-    gap: 24px;
+    flex-direction: column;
+    gap: 15px;
 }
 
-.ten-x {
-    font-size: clamp(60px, 8vw, 82px);
-    font-weight: 900;
-    color: var(--primary);
-    line-height: 1;
-    white-space: nowrap;
-}
-
-.ten-x span {
-    display: inline-block;
-    transform-origin: center;
-}
-
-.metric-10x p {
-    font-size: 15px;
+.card-label {
+    font-size: 12px;
+    letter-spacing: 1px;
     font-weight: 700;
-    max-width: 280px;
-    line-height: 1.3;
 }
+
+.after-group .card-label {
+    color: #8C52FE;
+}
+
+.before-group .card-label {
+    color: white;
+    opacity: 1;
+}
+
+.mini-card {
+    background: rgba(255, 255, 255, 0.04);
+    border-left: 2px solid #8C52FE;
+    padding: 14px 18px;
+    border-radius: 8px;
+    font-weight: 700;
+    color: #ffffff;
+    max-width: 260px;
+    text-align: center;
+}
+
+.mini-card.muted {
+    border-left: 2px solid rgba(255, 255, 255, 0.2);
+    opacity: 0.6;
+}
+
+/* ===================================== */
+/* GRAPH LABELS */
+/* ===================================== */
+
+.graph-label {
+    position: absolute;
+    font-size: 13px;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+}
+
+.label-before {
+    bottom: 90px;
+    left: 140px;
+    opacity: 0.7;
+
+}
+
+.label-after {
+    top: 90px;
+    right: 120px;
+    color: #8C52FE;
+}
+
+/* ===================================== */
+/* RESPONSIVE */
+/* ===================================== */
+
+@media (max-width: 1024px) {
+
+    .revenue-header {
+        flex-direction: column;
+        gap: 60px;
+    }
+
+    .revenue-right-head {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .revenue-graph-card,
+    .revenue-cards {
+        width: 100%;
+        flex: none;
+    }
+}
+
 
 /* ===================================== */
 /* MODEL CARD (CENTERED BELOW) */
@@ -1304,23 +1400,47 @@ section {
 
 .revenue-right {
     width: 100%;
-    max-width: 720px;
+    max-width: 900px;
+    /* was 720px */
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 40px;
+    gap: 50px;
 }
 
+
 .model-card {
-    background: #0a0a0c;
+    position: relative;
     border-radius: 20px;
     padding: 32px;
     color: #ffffff;
     display: flex;
     justify-content: space-between;
-    position: relative;
     overflow: hidden;
+    background: linear-gradient(270deg,
+            #8C52FE,
+            #00E0FF,
+            #FF3CAC,
+            #784BA0,
+            #8C52FE);
+    background-size: 400% 400%;
+    animation: gradientFlow 12s ease infinite;
 }
+
+@keyframes gradientFlow {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
 
 .model-text h4 {
     font-size: 24px;
@@ -1828,7 +1948,7 @@ section {
     font-size: clamp(40px, 6vw, 64px);
     font-weight: 900;
     color: #fff;
-    margin-bottom: 80px;
+    margin-bottom: 50px;
     letter-spacing: -2px;
 }
 
@@ -2654,7 +2774,7 @@ body::after {
 
 .nav-pill.active {
     background: linear-gradient(135deg, #8C52FE, #5b2bdf);
-    color: #fff;
+    color: #000000;
     box-shadow: 0 0 25px rgba(140, 82, 254, 0.5);
     transform: translateY(-4px);
 }
@@ -4061,6 +4181,61 @@ body {
 /* SECTION FOUR CARDS */
 /* ========================================= */
 
+.four-cards-header {
+    text-align: center;
+    padding-top: 120px;
+    margin-bottom: 80px;
+}
+
+.four-cards-header h1 {
+    font-size: clamp(34px, 5vw, 56px);
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.2;
+}
+
+.rotating-text-wrapper {
+    display: inline-block;
+    position: relative;
+    height: 1.2em;
+    overflow: hidden;
+    vertical-align: bottom;
+}
+
+.rotating-word {
+    position: absolute;
+    left: 0;
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 0.6s cubic-bezier(.77, 0, .18, 1);
+    color: var(--primary);
+}
+
+.rotating-word.active {
+    opacity: 1;
+    transform: translateY(0px);
+}
+
+.four-subtitle {
+    margin-top: 24px;
+    font-size: 20px;
+    color: #ffffff;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+    opacity: 1;
+}
+
+.four-subtitle span {
+    /* color: inherit; */
+}
+
+.highlight-ai {
+    color: var(--primary);
+    font-weight: 600;
+}
+
 .section-four-cards {
     background:
         radial-gradient(700px circle at 50% 0%,
@@ -4191,6 +4366,10 @@ body {
     margin: 0 auto;
     height: 100vh;
     width: 100%;
+    min-height: 100vh;
+    /* better than height */
+    padding: 80px 40px;
+    box-sizing: border-box;
 }
 
 /* ========================================= */
@@ -4198,7 +4377,7 @@ body {
 /* ========================================= */
 
 .four-card-wrapper {
-    flex: 1;
+    flex: 1 1 240px;
     max-width: 280px;
     display: flex;
     flex-direction: column;
@@ -4240,7 +4419,7 @@ body {
 /* ========================================= */
 
 .card-beam {
-    width: 2px;
+    width: 3px;
     height: 60px;
     background: linear-gradient(to bottom,
             rgba(140, 82, 254, 0),
@@ -4285,21 +4464,20 @@ body {
 @media (max-width: 1024px) {
 
     .four-cards-container {
-        gap: 24px;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 40px;
+        padding: 60px 30px;
+        min-height: auto;
     }
 
     .four-card-wrapper {
-        max-width: 220px;
+        flex: 1 1 220px;
+        max-width: 240px;
     }
 
-    .four-card-content h4 {
-        font-size: 18px;
-    }
-
-    .four-card-content p {
-        font-size: 13px;
-    }
 }
+
 
 @media (max-width: 768px) {
 
@@ -4309,13 +4487,19 @@ body {
     }
 
     .four-cards-container {
-        flex-wrap: wrap;
-        height: auto;
-        gap: 48px 20px;
+        flex-direction: column;
+        align-items: center;
+        gap: 60px;
+        padding: 60px 24px;
     }
 
     .four-card-wrapper {
-        max-width: 160px;
+        width: 100%;
+        max-width: 320px;
+    }
+
+    .four-card {
+        border-radius: 16px;
     }
 
     .card-beam {
@@ -4335,6 +4519,14 @@ body {
     .four-card-wrapper {
         max-width: 100%;
         width: 100%;
+    }
+
+    .four-card-content h4 {
+        font-size: 16px;
+    }
+
+    .four-card-content p {
+        font-size: 13px;
     }
 }
 
@@ -4389,8 +4581,8 @@ body {
     z-index: 2;
 }
 
-.pov-header h2 {
-    font-size: 2.5rem;
+.pov-header h1 {
+    font-size: 3.5rem;
     font-weight: 700;
     color: #fff;
     margin-bottom: 20px;
@@ -4410,7 +4602,7 @@ body {
 }
 
 .flow-item {
-    font-size: 0.9rem;
+    font-size: 1.8rem;
     font-weight: 600;
     color: rgba(255, 255, 255, 0.4);
     transition: all 0.4s ease;
