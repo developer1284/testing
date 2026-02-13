@@ -497,33 +497,33 @@ document.addEventListener('DOMContentLoaded', () => {
             if (servicesTrack) servicesTrack.style.overflow = "visible";
 
             // B. DECRYPT TEXT PREP
-            const originalDescText = metricDesc.innerText;
-            // PRESERVE SPACES using a custom split
-            const charsDesc = originalDescText.split('');
-            const randomChars = "01XA_/"; // Techy scramble pool
+            // const originalDescText = metricDesc.innerText;
+            // // PRESERVE SPACES using a custom split
+            // const charsDesc = originalDescText.split('');
+            // const randomChars = "01XA_/"; // Techy scramble pool
 
-            // Build HTML with preserved layout
-            let newHTML = '';
-            charsDesc.forEach(char => {
-                if (char === ' ') {
-                    // Non-breaking space to prevent collapse
-                    newHTML += '<span style="display:inline-block; white-space:pre">&nbsp;</span>';
-                } else {
-                    // Scrambled placeholder
-                    newHTML += `<span style="display:inline-block">0</span>`;
-                }
-            });
-            metricDesc.innerHTML = newHTML;
+            // // Build HTML with preserved layout
+            // let newHTML = '';
+            // charsDesc.forEach(char => {
+            //     if (char === ' ') {
+            //         // Non-breaking space to prevent collapse
+            //         newHTML += '<span style="display:inline-block; white-space:pre">&nbsp;</span>';
+            //     } else {
+            //         // Scrambled placeholder
+            //         newHTML += `<span style="display:inline-block">0</span>`;
+            //     }
+            // });
+            // metricDesc.innerHTML = newHTML;
 
-            const descSpans = metricDesc.querySelectorAll('span');
+            // const descSpans = metricDesc.querySelectorAll('span');
 
-            // Set random chars initially for non-space
-            descSpans.forEach((span, i) => {
-                const char = charsDesc[i];
-                if (char !== ' ') {
-                    span.innerText = randomChars[Math.floor(Math.random() * randomChars.length)];
-                }
-            });
+            // // Set random chars initially for non-space
+            // descSpans.forEach((span, i) => {
+            //     const char = charsDesc[i];
+            //     if (char !== ' ') {
+            //         span.innerText = randomChars[Math.floor(Math.random() * randomChars.length)];
+            //     }
+            // });
 
             // C. TIMELINE
             const tenXTl = gsap.timeline({
@@ -640,6 +640,104 @@ if (typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined") {
             }
         });
 
+        // ===============================
+        // HEADER ROTATION (AUTO INTERVAL - INDEPENDENT)
+        // ===============================
+        const rotatingWords = document.querySelectorAll(".rotating-word");
+
+        if (rotatingWords.length > 0) {
+            // 1. Set Initial State: All hidden/down, except first one visible/neutral
+            gsap.set(rotatingWords, { opacity: 0, y: 40 });
+            gsap.set(rotatingWords[0], { opacity: 1, y: 0 });
+
+            let currentIndex = 0;
+
+            // 2. Interval Animation (Every 2.5s)
+            setInterval(() => {
+                const nextIndex = (currentIndex + 1) % rotatingWords.length;
+                const currentWord = rotatingWords[currentIndex];
+                const nextWord = rotatingWords[nextIndex];
+
+                const tl = gsap.timeline();
+
+                // Exit current (Upward)
+                tl.to(currentWord, {
+                    y: -40,
+                    opacity: 0,
+                    duration: 0.6,
+                    ease: "power2.in",
+                }, 0);
+
+                // Enter next (From Bottom)
+                tl.fromTo(nextWord,
+                    { y: 40, opacity: 0 },
+                    { y: 0, opacity: 1, duration: 0.8, ease: "power2.out" },
+                    "-=0.2" // Overlap slightly
+                );
+
+                currentIndex = nextIndex;
+            }, 2500);
+        }
+
+        // ======================================
+        // BEAM BRANCHING LOGIC (Dynamic connection)
+        // ======================================
+        const beamBranches = document.querySelectorAll(".beam-branch");
+        const globalBeam = document.querySelector(".global-beam");
+        const fourContainer = document.querySelector(".four-cards-container");
+
+        function updateBeamPaths() {
+            if (!globalBeam || !fourContainer || beamBranches.length === 0) return;
+
+            const containerRect = fourContainer.getBoundingClientRect();
+            const beamRect = globalBeam.getBoundingClientRect();
+
+            // Beam Source X (Relative to container)
+            const sourceX = beamRect.left + beamRect.width / 2 - containerRect.left;
+            // Beam Source Y (We'll start branches from slightly below top, or near card top)
+            // Let's use a fixed offset relative to container top, e.g. 100px down
+            // OR dynamically based on the global beam's visual start.
+            // Using a shared start point for now:
+            const sourceY = 0; // Top of container (where beam starts growing)
+
+            fourCardWrappers.forEach((wrapper, index) => {
+                const branch = beamBranches[index];
+                if (!branch) return;
+
+                const cardRect = wrapper.querySelector('.four-card')?.getBoundingClientRect();
+                if (!cardRect) return;
+
+                // Target Point (Center of card's left/right edge closest to beam? Or Center-Center?)
+                // Center-Center is safest for "connection"
+                const targetX = cardRect.left + cardRect.width / 2 - containerRect.left;
+                const targetY = cardRect.top + cardRect.height / 2 - containerRect.top;
+
+                // Control Point for Bezier (Curved out)
+                // We want it to look like it splits from the vertical beam.
+                // So CP1 should be vertical down from source.
+                // CP2 should be horizontal to target?
+                // Let's try simple Quad: M startX startY Q startX targetY targetX targetY
+                // This makes it go down transforming to horizontal.
+                // Or Cubic: C sourceX (targetY * 0.5) sourceX targetY targetX targetY
+
+                const midY = sourceY + (targetY - sourceY) * 0.6;
+                const pathData = `M ${sourceX} ${sourceY} C ${sourceX} ${midY}, ${sourceX} ${targetY}, ${targetX} ${targetY}`;
+
+                branch.setAttribute("d", pathData);
+
+                // Update stroke-dasharray for draw animation
+                const length = branch.getTotalLength();
+                branch.style.strokeDasharray = length;
+                branch.style.strokeDashoffset = length; // Ensure hidden initially
+            });
+        }
+
+        // Initial Calc + Resize Listener
+        updateBeamPaths();
+        window.addEventListener("resize", updateBeamPaths);
+        // Also update on scroll initially to catch any shift? No, resize is enough.
+
+
         // Loop through each card/beam pair
         fourCardWrappers.forEach((wrapper, index) => {
             const beam = wrapper.querySelector(".card-beam");
@@ -652,6 +750,21 @@ if (typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined") {
                 duration: 2,
                 ease: "power3.out"
             });
+
+            // 1.5 Branch Draws (Connects beam to card)
+            // Added immediately after card entry
+            const branchPath = document.querySelectorAll(".beam-branch")[index];
+            if (branchPath) {
+                fcTl.to(branchPath, {
+                    strokeDashoffset: 0,
+                    duration: 1.2,
+                    ease: "power2.out"
+                }, "<"); // Synced with card entry (start at same time or slightly delayed?)
+                // User said "Add immediately after fcTl.to(container...". 
+                // Using "<" syncs with START of previous. ">" syncs with END.
+                // "When card animates upward... its connected branch should draw toward it."
+                // Since card animation is 2s, drawing in 1.2s synced with start looks good.
+            }
 
             // 2. Beam Grows Downward (After card settles)
             if (beam) {
@@ -669,7 +782,6 @@ if (typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined") {
 
         // GLOBAL BEAM ANIMATION (Critical Continuity)
         // ===================================
-        const globalBeam = document.querySelector(".global-beam");
         if (globalBeam) {
             // Grow continuously from start to finish + overlap
             fcTl.to(globalBeam, {
@@ -1250,3 +1362,56 @@ document.addEventListener("mousemove", (e) => {
     glow.style.left = e.clientX + "px";
     glow.style.top = e.clientY + "px";
 });
+
+// Revenue Graph Animation (Pinned & Scrubbed) - ISOLATED FIX
+const revenueSection = document.querySelector('.section-revenue');
+const revBefore = document.querySelector('.rev-before');
+const revAfter = document.querySelector('.rev-after');
+const miniCards = document.querySelectorAll('.mini-card');
+
+if (revenueSection && revBefore && revAfter) {
+
+    // PREPARE SVG LINES
+    [revBefore, revAfter].forEach(line => {
+        const length = line.getTotalLength();
+        gsap.set(line, {
+            strokeDasharray: length,
+            strokeDashoffset: length
+        });
+    });
+
+    // PREPARE CARDS
+    gsap.set(miniCards, { opacity: 0 });
+
+    // ISOLATED TIMELINE
+    const revenueTL = gsap.timeline({
+        scrollTrigger: {
+            trigger: ".section-revenue",
+            start: "top top",
+            end: "+=2000",
+            scrub: 1,
+            pin: true,
+            anticipatePin: 1
+        }
+    });
+
+    // ANIMATION SEQUENCE
+    // 1. Draw .rev-before (slow)
+    revenueTL.to(revBefore, {
+        strokeDashoffset: 0,
+        duration: 3,
+        ease: "power1.out"
+    })
+        // 2. Draw .rev-after (smooth)
+        .to(revAfter, {
+            strokeDashoffset: 0,
+            duration: 3,
+            ease: "power2.out"
+        }, "-=1") // Smooth overlap
+        // 3. Fade in .mini-card with stagger 0.2
+        .to(miniCards, {
+            opacity: 1,
+            stagger: 0.2,
+            duration: 1
+        }, "-=0.5");
+}
