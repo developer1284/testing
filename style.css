@@ -3095,6 +3095,103 @@ body::after {
     }
 }
 
+/* Mobile Workflow Optimization */
+@media (max-width: 768px) {
+    .section-workflow {
+        padding: 40px 0;
+    }
+
+    .workflow-header {
+        margin-bottom: 40px;
+        padding: 0 20px;
+    }
+
+    .workflow-header h2 {
+        font-size: 32px;
+        margin-bottom: 12px;
+    }
+
+    .workflow-sub {
+        font-size: 15px;
+        padding: 0 10px;
+    }
+
+    .workflow-nav {
+        justify-content: flex-start;
+        overflow-x: auto;
+        padding-bottom: 10px;
+        padding-left: 20px;
+        padding-right: 20px;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        gap: 12px;
+    }
+
+    /* Hide scrollbar for cleaner look */
+    .workflow-nav::-webkit-scrollbar {
+        height: 4px;
+    }
+
+    .workflow-nav::-webkit-scrollbar-thumb {
+        background: rgba(140, 82, 254, 0.3);
+        border-radius: 4px;
+    }
+
+    .nav-pill {
+        padding: 10px 24px;
+        font-size: 14px;
+    }
+
+    .workflow-card {
+        padding: 24px;
+        border-radius: 24px;
+        margin: 0 16px;
+        /* Add side margin on mobile */
+    }
+
+    .workflow-content {
+        gap: 40px;
+    }
+
+    .step-badge {
+        margin-bottom: 16px;
+    }
+
+    .step-title {
+        font-size: 24px;
+        margin-bottom: 12px;
+    }
+
+    .step-desc {
+        font-size: 15px;
+    }
+
+    /* Dashboard Mockup Mobile */
+    .dashboard-mockup {
+        padding: 16px;
+    }
+
+    .dash-header {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .dash-metric {
+        width: 48%;
+        /* 2 per row */
+        flex: none;
+        padding: 10px;
+    }
+
+    .dm-label {
+        font-size: 9px;
+    }
+
+    .dm-value {
+        font-size: 14px;
+    }
+}
+
 /* 1. ANIMATED SPHERES (FIGMA STYLE) */
 .f-spheres-layer {
     position: absolute;
@@ -5649,4 +5746,3 @@ body {
 }
 
 /
-
