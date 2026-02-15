@@ -1,11 +1,18 @@
 // =========================================
 // GLOBAL GSAP REGISTRATION
 // =========================================
-if (typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined") {
-    gsap.registerPlugin(ScrollTrigger);
-}
+// GSAP REGISTRATION MOVED TO DOMContentLoaded FOR SAFETY
 
 document.addEventListener("DOMContentLoaded", () => {
+    // ===== GSAP SAFE INIT (PRODUCTION SAFE) =====
+    if (typeof gsap === "undefined") {
+        console.warn("GSAP not loaded. Stopping animation execution.");
+        return;
+    }
+
+    if (typeof ScrollTrigger !== "undefined") {
+        gsap.registerPlugin(ScrollTrigger);
+    }
 
     /* =========================================
        1. PHILOSOPHY SECTION TABS
@@ -1288,7 +1295,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const revAfter = document.querySelector('.rev-after');
         const miniCards = document.querySelectorAll('.mini-card');
 
-        if (revenueSection && revBefore && revAfter) {
+        if (revenueSection && revBefore && revAfter && typeof gsap !== 'undefined') {
             [revBefore, revAfter].forEach(line => {
                 const length = line.getTotalLength();
                 gsap.set(line, {
@@ -1330,6 +1337,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // REFRESH SCROLLTRIGGER AFTER SETUP
     if (typeof ScrollTrigger !== 'undefined') {
-        ScrollTrigger.refresh();
+        ScrollTrigger.refresh(true);
     }
 });
