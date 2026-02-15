@@ -1417,12 +1417,7 @@ section {
     display: flex;
     justify-content: space-between;
     overflow: hidden;
-    background: linear-gradient(270deg,
-            #8C52FE,
-            #00E0FF,
-            #FF3CAC,
-            #784BA0,
-            #8C52FE);
+    background: black;
     background-size: 400% 400%;
     animation: gradientFlow 12s ease infinite;
 }
@@ -5637,3 +5632,4 @@ body {
 }
 
 /
+
