@@ -1540,7 +1540,7 @@ section {
 
 .model-card {
     position: relative;
-    border-radius: 20px;
+    border-radius: 30px;
     border-color: #8C52FE;
     padding: 32px;
     color: #ffffff;
@@ -5868,3 +5868,4 @@ body {
 }
 
 /
+
