@@ -586,126 +586,156 @@ document.addEventListener("DOMContentLoaded", () => {
        17. FOUR CARDS SCROLL STORYTELLING
        ========================================= */
     if (typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined") {
-        {
-            const fourCardsSection = document.querySelector(".section-four-cards");
-            const fourCardWrappers = document.querySelectorAll(".four-card-wrapper");
+        const mm = gsap.matchMedia();
 
-            if (fourCardsSection && fourCardWrappers.length > 0) {
-                gsap.set(fourCardWrappers, {
-                    y: 120,
-                    opacity: 0,
-                    filter: "blur(12px)"
-                });
+        // DESKTOP: (min-width: 1025px)
+        mm.add("(min-width: 1025px)", () => {
+            window.addEventListener("load", function () {
+                const fourCardsSection = document.querySelector(".section-four-cards");
+                const fourCardWrappers = document.querySelectorAll(".four-card-wrapper");
 
-                const cardBeams = document.querySelectorAll(".card-beam");
-                gsap.set(cardBeams, {
-                    scaleY: 0,
-                    transformOrigin: "top center",
-                    opacity: 0
-                });
-
-                const fcTl = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: ".section-four-cards",
-                        start: "top top",
-                        end: "+=3000",
-                        scrub: 1,
-                        pin: true,
-                        anticipatePin: 1
-                    }
-                });
-
-                // HEADER ROTATION (AUTO INTERVAL)
-                const rotatingWords = document.querySelectorAll(".rotating-word");
-                if (rotatingWords.length > 0) {
-                    gsap.set(rotatingWords, { opacity: 0, y: 40 });
-                    gsap.set(rotatingWords[0], { opacity: 1, y: 0 });
-
-                    let currentIndex = 0;
-                    setInterval(() => {
-                        const nextIndex = (currentIndex + 1) % rotatingWords.length;
-                        const currentWord = rotatingWords[currentIndex];
-                        const nextWord = rotatingWords[nextIndex];
-                        const tl = gsap.timeline();
-
-                        tl.to(currentWord, {
-                            y: -40, opacity: 0, duration: 0.6, ease: "power2.in",
-                        }, 0);
-
-                        tl.fromTo(nextWord,
-                            { y: 40, opacity: 0 },
-                            { y: 0, opacity: 1, duration: 0.8, ease: "power2.out" },
-                            "-=0.2"
-                        );
-                        currentIndex = nextIndex;
-                    }, 2500);
-                }
-
-                // BEAM BRANCHING LOGIC
-                const beamBranches = document.querySelectorAll(".beam-branch");
-                const globalBeam = document.querySelector(".global-beam");
-                const fourContainer = document.querySelector(".four-cards-container");
-
-                function updateBeamPaths() {
-                    if (!globalBeam || !fourContainer || beamBranches.length === 0) return;
-                    const containerRect = fourContainer.getBoundingClientRect();
-                    const beamRect = globalBeam.getBoundingClientRect();
-                    const sourceX = beamRect.left + beamRect.width / 2 - containerRect.left;
-                    const sourceY = 0;
-
-                    fourCardWrappers.forEach((wrapper, index) => {
-                        const branch = beamBranches[index];
-                        if (!branch) return;
-                        const cardRect = wrapper.querySelector('.four-card')?.getBoundingClientRect();
-                        if (!cardRect) return;
-                        const targetX = cardRect.left + cardRect.width / 2 - containerRect.left;
-                        const targetY = cardRect.top + cardRect.height / 2 - containerRect.top;
-                        const midY = sourceY + (targetY - sourceY) * 0.6;
-                        const pathData = `M ${sourceX} ${sourceY} C ${sourceX} ${midY}, ${sourceX} ${targetY}, ${targetX} ${targetY}`;
-                        branch.setAttribute("d", pathData);
-                        const length = branch.getTotalLength();
-                        branch.style.strokeDasharray = length;
-                        branch.style.strokeDashoffset = length;
+                if (fourCardsSection && fourCardWrappers.length > 0) {
+                    gsap.set(fourCardWrappers, {
+                        y: 120,
+                        opacity: 0,
+                        filter: "blur(12px)"
                     });
-                }
-                updateBeamPaths();
-                window.addEventListener("resize", updateBeamPaths);
 
-                fourCardWrappers.forEach((wrapper, index) => {
-                    const beam = wrapper.querySelector(".card-beam");
-                    fcTl.to(wrapper, {
-                        y: 0, opacity: 1, filter: "blur(0px)", duration: 2, ease: "power3.out"
+                    const cardBeams = document.querySelectorAll(".card-beam");
+                    gsap.set(cardBeams, {
+                        scaleY: 0,
+                        transformOrigin: "top center",
+                        opacity: 0
                     });
-                    const branchPath = document.querySelectorAll(".beam-branch")[index];
-                    if (branchPath) {
-                        fcTl.to(branchPath, {
-                            strokeDashoffset: 0, duration: 1.2, ease: "power2.out"
-                        }, "<");
+
+                    const fcTl = gsap.timeline({
+                        scrollTrigger: {
+                            trigger: ".section-four-cards",
+                            start: "top top",
+                            end: "+=3000",
+                            scrub: 1,
+                            pin: true,
+                            anticipatePin: 1
+                        }
+                    });
+
+                    // HEADER ROTATION (AUTO INTERVAL)
+                    const rotatingWords = document.querySelectorAll(".rotating-word");
+                    if (rotatingWords.length > 0) {
+                        gsap.set(rotatingWords, { opacity: 0, y: 40 });
+                        gsap.set(rotatingWords[0], { opacity: 1, y: 0 });
+
+                        let currentIndex = 0;
+                        setInterval(() => {
+                            const nextIndex = (currentIndex + 1) % rotatingWords.length;
+                            const currentWord = rotatingWords[currentIndex];
+                            const nextWord = rotatingWords[nextIndex];
+                            const tl = gsap.timeline();
+
+                            tl.to(currentWord, {
+                                y: -40, opacity: 0, duration: 0.6, ease: "power2.in",
+                            }, 0);
+
+                            tl.fromTo(nextWord,
+                                { y: 40, opacity: 0 },
+                                { y: 0, opacity: 1, duration: 0.8, ease: "power2.out" },
+                                "-=0.2"
+                            );
+                            currentIndex = nextIndex;
+                        }, 2500);
                     }
-                    if (beam) {
-                        fcTl.to(beam, {
-                            scaleY: 1, opacity: 1, duration: 1.5, ease: "power2.out"
+
+                    // BEAM BRANCHING LOGIC
+                    const beamBranches = document.querySelectorAll(".beam-branch");
+                    const globalBeam = document.querySelector(".global-beam");
+                    const fourContainer = document.querySelector(".four-cards-container");
+
+                    function updateBeamPaths() {
+                        if (!globalBeam || !fourContainer || beamBranches.length === 0) return;
+                        const containerRect = fourContainer.getBoundingClientRect();
+                        const beamRect = globalBeam.getBoundingClientRect();
+                        const sourceX = beamRect.left + beamRect.width / 2 - containerRect.left;
+                        const sourceY = 0;
+
+                        fourCardWrappers.forEach((wrapper, index) => {
+                            const branch = beamBranches[index];
+                            if (!branch) return;
+                            const cardRect = wrapper.querySelector('.four-card')?.getBoundingClientRect();
+                            if (!cardRect) return;
+                            const targetX = cardRect.left + cardRect.width / 2 - containerRect.left;
+                            const targetY = cardRect.top + cardRect.height / 2 - containerRect.top;
+                            const midY = sourceY + (targetY - sourceY) * 0.6;
+                            const pathData = `M ${sourceX} ${sourceY} C ${sourceX} ${midY}, ${sourceX} ${targetY}, ${targetX} ${targetY}`;
+                            branch.setAttribute("d", pathData);
+                            const length = branch.getTotalLength();
+                            branch.style.strokeDasharray = length;
+                            branch.style.strokeDashoffset = length;
                         });
                     }
-                });
 
-                fcTl.to({}, { duration: 1 });
+                    // Image Load Safety
+                    const fourImages = document.querySelectorAll(".four-card-img");
+                    let loadedImages = 0;
 
-                if (globalBeam) {
-                    fcTl.to(globalBeam, {
-                        scaleY: 1, ease: "none", duration: fcTl.totalDuration() || 5
-                    }, 0);
-                }
-            }
+                    fourImages.forEach(img => {
+                        if (img.complete) {
+                            loadedImages++;
+                        } else {
+                            img.addEventListener("load", () => {
+                                loadedImages++;
+                                if (loadedImages === fourImages.length) {
+                                    updateBeamPaths();
+                                    ScrollTrigger.refresh();
+                                }
+                            });
+                        }
+                    });
 
-            if (window.innerWidth <= 1024) {
-                ScrollTrigger.getAll().forEach(st => {
-                    if (st.trigger?.classList?.contains('section-four-cards')) {
-                        st.kill();
+                    // Initial calls if images already cached/loaded
+                    if (loadedImages === fourImages.length) {
+                        updateBeamPaths();
+                        ScrollTrigger.refresh();
                     }
-                });
-            }
-        }
+
+                    window.addEventListener("resize", updateBeamPaths);
+
+                    fourCardWrappers.forEach((wrapper, index) => {
+                        const beam = wrapper.querySelector(".card-beam");
+                        fcTl.to(wrapper, {
+                            y: 0, opacity: 1, filter: "blur(0px)", duration: 2, ease: "power3.out"
+                        });
+                        const branchPath = document.querySelectorAll(".beam-branch")[index];
+                        if (branchPath) {
+                            fcTl.to(branchPath, {
+                                strokeDashoffset: 0, duration: 1.2, ease: "power2.out"
+                            }, "<");
+                        }
+                        if (beam) {
+                            fcTl.to(beam, {
+                                scaleY: 1, opacity: 1, duration: 1.5, ease: "power2.out"
+                            });
+                        }
+                    });
+
+                    fcTl.to({}, { duration: 1 });
+
+                    if (globalBeam) {
+                        fcTl.to(globalBeam, {
+                            scaleY: 1, ease: "none", duration: fcTl.totalDuration() || 5
+                        }, 0);
+                    }
+                }
+            });
+        });
+
+        // MOBILE: (max-width: 1024px)
+        mm.add("(max-width: 1024px)", () => {
+            ScrollTrigger.getAll().forEach(st => {
+                if (st.trigger?.classList?.contains("section-four-cards")) {
+                    st.kill();
+                }
+            });
+        });
     }
 
     /* =========================================
@@ -888,7 +918,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
 
                 // Helper to animate graph, dots, gauge, and numbers (called on step update)
-                animateGraphAndMetrics = (dataMetrics, gaugeValue) => {
+                let animateGraphAndMetrics = (dataMetrics, gaugeValue) => {
                     // 1. Reset & Animate Line
                     gsap.killTweensOf(chartLine);
                     gsap.fromTo(chartLine,
@@ -1356,6 +1386,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // REFRESH SCROLLTRIGGER AFTER SETUP
     if (typeof ScrollTrigger !== 'undefined') {
-        ScrollTrigger.refresh(true);
+        window.addEventListener("load", () => {
+            setTimeout(() => {
+                ScrollTrigger.refresh();
+            }, 300);
+        });
+
+        window.addEventListener("resize", () => {
+            ScrollTrigger.refresh();
+        });
     }
 });
+
