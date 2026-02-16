@@ -107,6 +107,7 @@ section {
 .nav-links {
     display: flex;
     gap: 40px;
+    margin-left: auto;
 }
 
 .nav-links a {
@@ -5408,6 +5409,9 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
+    position: absolute;
+    left: 28px;
+    bottom: 28px;
 }
 
 /* =========================================
@@ -5422,6 +5426,7 @@ body {
     filter: brightness(1.2) contrast(1.1);
     animation: logoGlow 3s infinite alternate;
     transition: all 0.3s ease;
+    position: relative;
 }
 
 @keyframes logoGlow {
