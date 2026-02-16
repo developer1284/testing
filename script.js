@@ -1335,6 +1335,25 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    /* =========================================
+       19. ICON PILL LOGO ANIMATION
+       ========================================= */
+    if (typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined") {
+        gsap.to(".sa-icon-pill img", {
+            scrollTrigger: {
+                trigger: ".sa-icon-row",
+                start: "top 80%",
+                toggleActions: "play none none none"
+            },
+            opacity: 1,
+            x: 0,
+            scale: 1,
+            duration: 0.6,
+            stagger: 0.25,
+            ease: "power3.out"
+        });
+    }
+
     // REFRESH SCROLLTRIGGER AFTER SETUP
     if (typeof ScrollTrigger !== 'undefined') {
         ScrollTrigger.refresh(true);
