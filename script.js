@@ -585,6 +585,7 @@ document.addEventListener("DOMContentLoaded", () => {
     /* =========================================
        17. FOUR CARDS SCROLL STORYTELLING
        ========================================= */
+
     if (typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined") {
         {
             const fourCardsSection = document.querySelector(".section-four-cards");
@@ -698,7 +699,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
 
-            if (window.innerWidth <= 1024) {
+            if (window.matchMedia("(max-width: 1024px)").matches) {
                 ScrollTrigger.getAll().forEach(st => {
                     if (st.trigger?.classList?.contains('section-four-cards')) {
                         st.kill();
@@ -707,6 +708,10 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
     }
+
+
+
+
 
     /* =========================================
        18. POV SCROLL STORY SECTION (BLOCK B)
@@ -888,7 +893,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
 
                 // Helper to animate graph, dots, gauge, and numbers (called on step update)
-                animateGraphAndMetrics = (dataMetrics, gaugeValue) => {
+                let animateGraphAndMetrics = (dataMetrics, gaugeValue) => {
                     // 1. Reset & Animate Line
                     gsap.killTweensOf(chartLine);
                     gsap.fromTo(chartLine,
@@ -1354,8 +1359,20 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // REFRESH SCROLLTRIGGER AFTER SETUP
+    // SAFE GLOBAL REFRESH AFTER ALL LOAD
     if (typeof ScrollTrigger !== 'undefined') {
-        ScrollTrigger.refresh(true);
+        window.addEventListener("load", () => {
+            setTimeout(() => {
+                ScrollTrigger.refresh();
+            }, 300);
+        });
     }
-});
+
+    // SAFE RESIZE REFRESH
+    window.addEventListener("resize", () => {
+        if (typeof ScrollTrigger !== "undefined") {
+            ScrollTrigger.refresh();
+        }
+    });
+
+
